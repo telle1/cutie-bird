@@ -1,5 +1,7 @@
-#canvas{
-    border:1px solid black;
-    display: block;
-    margin: 0 auto;
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
