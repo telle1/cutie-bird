@@ -180,26 +180,19 @@ const score = {
     score.value = 0
   },
   draw : function(){
-    ctx.fillStyle = "#FFF";
-    ctx.strokeStyle = "#FEC2BD";
+    ctx.strokeStyle = "#FFF";
     
     if(state.current == state.game){
         ctx.lineWidth = 2;
         ctx.font = "60px Arial";
-        ctx.fillText(this.value, cvs.width/2 -5, 80);
         ctx.strokeText(this.value, cvs.width/2 -5, 80);
         
     }else if(state.current == state.endGame){
         // SCORE VALUE
-        ctx.fillStyle = "#FEC2BD";
-        ctx.strokeStyle = "#FFF";
-
         ctx.font = "40px Arial";
-        ctx.fillText(this.value, 225, 170);
-        ctx.strokeText(this.value, 225, 170);
+        ctx.strokeText(this.value, 262, 174);
         // BEST SCORE
-        ctx.fillText(this.highest, 225, 228);
-        ctx.strokeText(this.highest, 225, 228);
+        ctx.strokeText(this.highest, 262, 232);
 
         if (this.highest < 5){
           medals.draw1();
@@ -221,8 +214,8 @@ const medals = {
   sy2: 162,
   w: 62,
   h: 59,
-  dx: 35,
-  dy: 180,
+  dx: 55,
+  dy: 185,
   draw1: function () {
     if (state.current == state.endGame) {
       ctx.drawImage(sprite, this.sx1, this.sy1, this.w, this.h, this.dx, this.dy, this.w, this.h);
@@ -300,3 +293,23 @@ function loop() {
 }
 
 loop();
+
+
+
+
+
+
+let dom_bird = document.getElementById('bird')
+let i = 0
+let moveBird = setInterval(()=>{ //-132 normal //92 down 
+let dom_bird_position = ['-640px -132px', '-640px -170px', '-640px -132px', '-640px -92px']
+    // dom_bird.style.objectPosition = dom_bird.style.objectPosition == '-465px -100px' ? '-640px -85px' : '-465px -100px';
+    dom_bird.style.objectPosition = dom_bird_position[i]
+    if (i == dom_bird_position.length - 1){
+      i = 0
+    } else {
+      i++
+    }
+}, 200)
+moveBird()
+console.log(dom_bird.style.objectPosition)
