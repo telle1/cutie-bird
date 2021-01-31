@@ -10,7 +10,7 @@ let speed = 0;
 window.addEventListener('resize', ()=> {
   if (window.innerWidth < 500) {
     jump = 7 
-    gravity = 0.7  
+    gravity = 1.5  
   }
 });
 
