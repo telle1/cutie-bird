@@ -19,7 +19,7 @@ window.addEventListener('resize', ()=> {
 let degToRad = Math.PI / 180;
 //IMAGE
 const sprite = new Image();
-sprite.src = 'sprite-2.png';
+sprite.src = 'final.png';
 //GAME STATES
 let state = {
   current: 0,
