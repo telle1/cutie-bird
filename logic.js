@@ -69,7 +69,7 @@ const bird = {
     let bird = this.images[this.frame];
     ctx.drawImage(sprite, bird.sx, bird.sy, this.w, this.h, this.dx, this.dy, this.w, this.h);
   },
-  fall: function () {
+  update: function () {
     this.period = state.current == state.beforeGame ? 10 : 5;
     //Change birds image each 5 or 10 frames depending on game state
     this.frame += frames % this.period == 0 ? 1 : 0;
@@ -163,6 +163,8 @@ const pipes = {
       //Remove pipe outside canvas
       if (p.x + this.w <= 0) {
         this.position.shift();
+        score.value += 1
+        score.highest = Math.max(score.value, score.highest);
       }
     }
   },
@@ -171,11 +173,69 @@ const pipes = {
 const score = {
   highest: 0,
   value: 0,
-  draw: function () {
-    ctx.fillStyle = '#fff';
-    ctx.strokeStyle = '#9E80FE';
-  },
+  draw : function(){
+    ctx.fillStyle = "#FFF";
+    ctx.strokeStyle = "#FEC2BD";
+    
+    if(state.current == state.game){
+        ctx.lineWidth = 2;
+        ctx.font = "60px Arial";
+        ctx.fillText(this.value, cvs.width/2 -5, 80);
+        ctx.strokeText(this.value, cvs.width/2 -5, 80);
+        
+    }else if(state.current == state.endGame){
+        // SCORE VALUE
+        ctx.font = "40px Arial";
+        ctx.fillText(this.value, 225, 170);
+        ctx.strokeText(this.value, 225, 170);
+        // BEST SCORE
+        ctx.fillText(this.highest, 225, 228);
+        ctx.strokeText(this.highest, 225, 228);
+
+        if (this.highest < 5){
+          medals.draw1();
+        } else if (this.highest < 10){
+          medals.draw2();
+        } else if (this.highest < 15){
+          medals.draw3();
+        } else {
+          medals.draw4();
+        }
+    }
+}
 };
+
+const medals = {
+  sx1: 687,
+  sx2: 750,
+  sy1: 98,
+  sy2: 162,
+  w: 62,
+  h: 59,
+  dx: 35,
+  dy: 180,
+  draw1: function () {
+    if (state.current == state.endGame) {
+      ctx.drawImage(sprite, this.sx1, this.sy1, this.w, this.h, this.dx, this.dy, this.w, this.h);
+    }
+  },
+  draw2: function () {
+    if (state.current == state.endGame) {
+      ctx.drawImage(sprite, this.sx2, this.sy1, this.w, this.h, this.dx, this.dy, this.w, this.h);
+    }
+  },
+  draw3: function () {
+    if (state.current == state.endGame) {
+      ctx.drawImage(sprite, this.sx1, this.sy2, this.w, this.h, this.dx, this.dy, this.w, this.h);
+    }
+  },
+  draw4: function () {
+    if (state.current == state.endGame) {
+      ctx.drawImage(sprite, this.sx2, this.sy2, this.w, this.h, this.dx, this.dy, this.w, this.h);
+    }
+  }
+}
+
 
 //STARTING SCREEN
 const startScreen = {
@@ -213,13 +273,13 @@ function draw() {
   bg.draw();
   bird.draw();
   pipes.draw();
-
   startScreen.draw();
   gameOver.draw();
+  score.draw();
 }
 
 function update() {
-  bird.fall();
+  bird.update();
   pipes.update();
 }
 
