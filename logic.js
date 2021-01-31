@@ -31,7 +31,9 @@ document.addEventListener('keydown', (evt) => {
       case state.endGame:
         state.current = state.beforeGame;
         pipes.clear();
+        score.clear();
         break;
+ 
     }
   }
 });
@@ -146,7 +148,6 @@ const pipes = {
         bird.dy + bird.radius > p.y &&
         bird.dy - bird.radius < p.y + this.h
       ) {
-        // ctx.drawImage(sprite, 520, 280, 200, 100, bird.dx - bird.radius, bird.dy - bird.radius, 200, 100);
         state.current = state.endGame;
       }
       // BOTTOM 
@@ -165,14 +166,19 @@ const pipes = {
         this.position.shift();
         score.value += 1
         score.highest = Math.max(score.value, score.highest);
+        localStorage.setItem("high_score", score.highest);
+
       }
     }
   },
 };
 
 const score = {
-  highest: 0,
+  highest: Number(localStorage.getItem("high_score")) || 0,
   value: 0,
+  clear: function(){
+    score.value = 0
+  },
   draw : function(){
     ctx.fillStyle = "#FFF";
     ctx.strokeStyle = "#FEC2BD";
@@ -185,6 +191,9 @@ const score = {
         
     }else if(state.current == state.endGame){
         // SCORE VALUE
+        ctx.fillStyle = "#FEC2BD";
+        ctx.strokeStyle = "#FFF";
+
         ctx.font = "40px Arial";
         ctx.fillText(this.value, 225, 170);
         ctx.strokeText(this.value, 225, 170);
