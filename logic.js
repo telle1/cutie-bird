@@ -29,9 +29,11 @@ document.addEventListener('keydown', (evt) => {
         bird.jump();
         break;
       case state.endGame:
-        state.current = state.beforeGame;
-        pipes.clear();
-        score.clear();
+        setTimeout(()=> {
+          state.current = state.beforeGame;
+          pipes.clear();
+          score.clear();
+        }, 500)
         break;
     }
   }
@@ -110,7 +112,7 @@ const pipes = {
   },
   w: 70,
   h: 400,
-  gap: 100,
+  gap: 95,
   dx: 2,
   maxYPos: -150,
   clear: function () {
@@ -161,8 +163,8 @@ const pipes = {
       if (
         bird.dx + bird.radius > p.x &&
         bird.dx - bird.radius < p.x + this.w &&
-        bird.dy + bird.radius > bottomPipeYPos &&
-        bird.dy - bird.radius < bottomPipeYPos + this.h
+        bird.dy + bird.radius + 20 > bottomPipeYPos && //Added 20 since seems like bird still hits pipe
+        bird.dy - bird.radius  < bottomPipeYPos + this.h
       ) {
         state.current = state.endGame;
       }
