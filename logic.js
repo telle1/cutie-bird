@@ -6,6 +6,10 @@ let frames = 0;
 let gravity = 0.3;
 let jump = 4.5;
 let speed = 0;
+if($(window).width() <= 768){
+  jump = 9 
+  gravity = 0.7
+}
 //OTHER VARS
 let degToRad = Math.PI / 180;
 //IMAGE
