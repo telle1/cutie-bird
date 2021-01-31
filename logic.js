@@ -18,7 +18,7 @@ let state = {
   game: 1,
   endGame: 2,
 };
-
+//GAME CONTROL
 document.addEventListener('keydown', (evt) => {
   if (evt.code === 'Space') {
     switch (state.current) {
@@ -33,7 +33,6 @@ document.addEventListener('keydown', (evt) => {
         pipes.clear();
         score.clear();
         break;
- 
     }
   }
 });
@@ -48,7 +47,7 @@ const bg = {
   dy: cvs.height - 600,
   draw: function () {
     ctx.drawImage(sprite, this.sx, this.sy, this.w, this.h, this.dx, this.dy, this.w, this.h);
-  }
+  },
 };
 
 //BIRD
@@ -59,32 +58,30 @@ const bird = {
     { sx: 643, sy: 170 },
     { sx: 643, sy: 132 },
   ],
-  radius: 8,
+  radius: 10,
   w: 43,
   h: 39,
   dx: 50,
   dy: 150,
   frame: 0,
   period: 0,
-  rotation: 0,
   draw: function () {
     let bird = this.images[this.frame];
     ctx.drawImage(sprite, bird.sx, bird.sy, this.w, this.h, this.dx, this.dy, this.w, this.h);
   },
   update: function () {
-    this.period = state.current == state.beforeGame ? 10 : 5;
     //Change birds image each 5 or 10 frames depending on game state
+    this.period = state.current == state.beforeGame ? 10 : 5;
     this.frame += frames % this.period == 0 ? 1 : 0;
     this.frame = this.frame % 4;
     if (state.current == state.beforeGame) {
       //RESET Y POSITION
       this.dy = 150;
-      this.rotation = 0 * degToRad;
       speed = 0;
     } else {
       speed += gravity;
       this.dy += speed;
-      //if bird touches ground
+      //WHEN BIRD TOUCHES GROUND
       const ground = cvs.height - 170;
       const birdBottom = this.dy + this.h / 2;
       if (birdBottom >= ground) {
@@ -102,7 +99,7 @@ const bird = {
 };
 
 const pipes = {
-  position: [], 
+  position: [],
   bottom: {
     sx: 851,
     sy: 0,
@@ -125,7 +122,17 @@ const pipes = {
       //top pipe
       ctx.drawImage(sprite, this.top.sx, this.top.sy, this.w, this.h, p.x, p.y, this.w, this.h);
       //bottom pipe
-      ctx.drawImage(sprite, this.bottom.sx, this.bottom.sy, this.w, this.h, p.x, p.y + this.h + this.gap, this.w, this.h);
+      ctx.drawImage(
+        sprite,
+        this.bottom.sx,
+        this.bottom.sy,
+        this.w,
+        this.h,
+        p.x,
+        p.y + this.h + this.gap,
+        this.w,
+        this.h
+      );
     }
   },
   update: function () {
@@ -141,7 +148,7 @@ const pipes = {
       let p = this.position[i];
       let bottomPipeYPos = p.y + this.h + this.gap;
       // COLLISION DETECTION
-      // TOP 
+      // TOP
       if (
         bird.dx + bird.radius > p.x &&
         bird.dx - bird.radius < p.x + this.w &&
@@ -150,7 +157,7 @@ const pipes = {
       ) {
         state.current = state.endGame;
       }
-      // BOTTOM 
+      // BOTTOM
       if (
         bird.dx + bird.radius > p.x &&
         bird.dx - bird.radius < p.x + this.w &&
@@ -164,47 +171,43 @@ const pipes = {
       //Remove pipe outside canvas
       if (p.x + this.w <= 0) {
         this.position.shift();
-        score.value += 1
+        score.value += 1;
         score.highest = Math.max(score.value, score.highest);
-        localStorage.setItem("high_score", score.highest);
-
+        localStorage.setItem('high_score', score.highest);
       }
     }
   },
 };
 
 const score = {
-  highest: Number(localStorage.getItem("high_score")) || 0,
+  highest: Number(localStorage.getItem('high_score')) || 0,
   value: 0,
-  clear: function(){
-    score.value = 0
+  clear: function () {
+    score.value = 0;
   },
-  draw : function(){
-    ctx.strokeStyle = "#FFF";
-    
-    if(state.current == state.game){
-        ctx.lineWidth = 2;
-        ctx.font = "60px Arial";
-        ctx.strokeText(this.value, cvs.width/2 -5, 80);
-        
-    }else if(state.current == state.endGame){
-        // SCORE VALUE
-        ctx.font = "40px Arial";
-        ctx.strokeText(this.value, 262, 174);
-        // BEST SCORE
-        ctx.strokeText(this.highest, 262, 232);
-
-        if (this.highest < 5){
-          medals.draw1();
-        } else if (this.highest < 10){
-          medals.draw2();
-        } else if (this.highest < 15){
-          medals.draw3();
-        } else {
-          medals.draw4();
-        }
+  draw: function () {
+    ctx.strokeStyle = '#FFF';
+    if (state.current == state.game) {
+      ctx.lineWidth = 2;
+      ctx.font = '60px Arial';
+      ctx.strokeText(this.value, cvs.width / 2 - 5, 80);
+    } else if (state.current == state.endGame) {
+      // SCORE VALUE
+      ctx.font = '40px Arial';
+      ctx.strokeText(this.value, 262, 174);
+      // BEST SCORE
+      ctx.strokeText(this.highest, 262, 232);
+      if (this.highest < 5) {
+        medals.draw1();
+      } else if (this.highest < 10) {
+        medals.draw2();
+      } else if (this.highest < 15) {
+        medals.draw3();
+      } else {
+        medals.draw4();
+      }
     }
-}
+  },
 };
 
 const medals = {
@@ -235,17 +238,16 @@ const medals = {
     if (state.current == state.endGame) {
       ctx.drawImage(sprite, this.sx2, this.sy2, this.w, this.h, this.dx, this.dy, this.w, this.h);
     }
-  }
-}
-
+  },
+};
 
 //STARTING SCREEN
 const startScreen = {
-  sx: 380,
+  sx: 368,
   sy: 30,
-  w: 235,
-  h: 55,
-  dx: cvs.width / 2 - 225 / 2,
+  w: 252,
+  h: 190,
+  dx: cvs.width / 2 - 252 / 2,
   dy: 50,
   draw: function () {
     if (state.current == state.beforeGame) {
@@ -270,12 +272,14 @@ const gameOver = {
 };
 
 function draw() {
+  //Clear canvas
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, cvs.width, cvs.height);
+  //Draw all canvas components
   bg.draw();
+  startScreen.draw();
   bird.draw();
   pipes.draw();
-  startScreen.draw();
   gameOver.draw();
   score.draw();
 }
@@ -294,22 +298,18 @@ function loop() {
 
 loop();
 
-
-
-
-
-
-let dom_bird = document.getElementById('bird')
-let i = 0
-let moveBird = setInterval(()=>{ //-132 normal //92 down 
-let dom_bird_position = ['-640px -132px', '-640px -170px', '-640px -132px', '-640px -92px']
-    // dom_bird.style.objectPosition = dom_bird.style.objectPosition == '-465px -100px' ? '-640px -85px' : '-465px -100px';
-    dom_bird.style.objectPosition = dom_bird_position[i]
-    if (i == dom_bird_position.length - 1){
-      i = 0
-    } else {
-      i++
-    }
-}, 200)
-moveBird()
-console.log(dom_bird.style.objectPosition)
+let dom_bird = document.getElementById('bird');
+let i = 0;
+let moveBird = setInterval(() => {
+  //-132 normal //92 down
+  let dom_bird_position = ['-640px -132px', '-640px -170px', '-640px -132px', '-640px -92px'];
+  // dom_bird.style.objectPosition = dom_bird.style.objectPosition == '-465px -100px' ? '-640px -85px' : '-465px -100px';
+  dom_bird.style.objectPosition = dom_bird_position[i];
+  if (i == dom_bird_position.length - 1) {
+    i = 0;
+  } else {
+    i++;
+  }
+}, 200);
+moveBird();
+console.log(dom_bird.style.objectPosition);
