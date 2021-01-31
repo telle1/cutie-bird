@@ -39,6 +39,25 @@ document.addEventListener('keydown', (evt) => {
   }
 });
 
+document.addEventListener('touchstart', () => {
+    switch (state.current) {
+      case state.beforeGame:
+        state.current = state.game;
+        break;
+      case state.game:
+        bird.jump();
+        break;
+      case state.endGame:
+        setTimeout(()=> {
+          state.current = state.beforeGame;
+          pipes.clear();
+          score.clear();
+        }, 500)
+        break;
+    }
+  }
+);
+
 //BACKGROUND
 const bg = {
   sx: 0,
