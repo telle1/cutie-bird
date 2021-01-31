@@ -7,7 +7,7 @@ let gravity = 0.3;
 let jump = 4.5;
 let speed = 0;
 //OTHER VARS
-let degToRad = Math.PI/180;
+let degToRad = Math.PI / 180;
 //IMAGE
 const sprite = new Image();
 sprite.src = 'sprite-2.png';
@@ -19,7 +19,7 @@ let state = {
   endGame: 2,
 };
 
-document.addEventListener('keydown', evt => {
+document.addEventListener('keydown', (evt) => {
   if (evt.code === 'Space') {
     switch (state.current) {
       case state.beforeGame:
@@ -30,12 +30,13 @@ document.addEventListener('keydown', evt => {
         break;
       case state.endGame:
         state.current = state.beforeGame;
+        pipes.clear();
         break;
     }
   }
 });
 
-//BACKGROUND 
+//BACKGROUND
 const bg = {
   sx: 0,
   sy: 0,
@@ -45,31 +46,8 @@ const bg = {
   dy: cvs.height - 600,
   draw: function () {
     ctx.drawImage(sprite, this.sx, this.sy, this.w, this.h, this.dx, this.dy, this.w, this.h);
-  },
-  update: function(){
-      if(state.current === state.game){
-        this.dx = (this.dx-2)%(this.w/2);
-      }
   }
 };
-
-const fg = {
-  sx: 0,
-  sy: 450,
-  w: 345,
-  h: 150,
-  dx: 0,
-  dy: cvs.height - 150,
-  draw: function () {
-    ctx.drawImage(sprite, this.sx, this.sy, this.w, this.h, this.dx, this.dy, this.w, this.h);
-  },
-  update: function(){
-      if(state.current === state.game){
-        this.dx = (this.dx-2)%(this.w);
-      }
-  }  
-}
-
 
 //BIRD
 const bird = {
@@ -79,23 +57,18 @@ const bird = {
     { sx: 643, sy: 170 },
     { sx: 643, sy: 132 },
   ],
-  w: 45,
-  h: 40,
-  dx: cvs.width / 2 - 45 / 2,
+  radius: 8,
+  w: 43,
+  h: 39,
+  dx: 50,
   dy: 150,
   frame: 0,
   period: 0,
   rotation: 0,
   draw: function () {
     let bird = this.images[this.frame];
-
-    // ctx.save();
-    // ctx.translate(this.dx, this.dy);
-    // ctx.rotate(this.rotation)
-
     ctx.drawImage(sprite, bird.sx, bird.sy, this.w, this.h, this.dx, this.dy, this.w, this.h);
-    // ctx.restore();
-},
+  },
   fall: function () {
     this.period = state.current == state.beforeGame ? 10 : 5;
     //Change birds image each 5 or 10 frames depending on game state
@@ -105,7 +78,7 @@ const bird = {
       //RESET Y POSITION
       this.dy = 150;
       this.rotation = 0 * degToRad;
-      speed = 0
+      speed = 0;
     } else {
       speed += gravity;
       this.dy += speed;
@@ -113,18 +86,12 @@ const bird = {
       const ground = cvs.height - 170;
       const birdBottom = this.dy + this.h / 2;
       if (birdBottom >= ground) {
-        this.frame = 1;
+        this.frame = 0;
         this.dy = ground - this.h / 2;
         if (state.current == state.game) {
           state.current = state.endGame;
         }
       }
-    //   if (speed >= jump){
-    //       this.rotation = 90 * degToRad;
-    //       this.frame = 1;
-    //   } else {
-    //       this.rotation = -25 * degToRad;
-    //   }
     }
   },
   jump: function () {
@@ -133,18 +100,82 @@ const bird = {
 };
 
 const pipes = {
+  position: [], 
+  bottom: {
+    sx: 851,
+    sy: 0,
+  },
+  top: {
+    sx: 934, //935
+    sy: 160, //162
+  },
+  w: 70,
+  h: 400,
+  gap: 100,
+  dx: 2,
+  maxYPos: -150,
+  clear: function () {
+    this.position = [];
+  },
+  draw: function () {
+    for (let i = 0; i < this.position.length; i++) {
+      let p = this.position[i];
+      //top pipe
+      ctx.drawImage(sprite, this.top.sx, this.top.sy, this.w, this.h, p.x, p.y, this.w, this.h);
+      //bottom pipe
+      ctx.drawImage(sprite, this.bottom.sx, this.bottom.sy, this.w, this.h, p.x, p.y + this.h + this.gap, this.w, this.h);
+    }
+  },
+  update: function () {
+    if (state.current !== state.game) return;
+    //Draw pipe every 100 frames
+    if (frames % 100 == 0) {
+      this.position.push({
+        x: cvs.width,
+        y: this.maxYPos * (Math.random() + 1),
+      });
+    }
+    for (let i = 0; i < this.position.length; i++) {
+      let p = this.position[i];
+      let bottomPipeYPos = p.y + this.h + this.gap;
+      // COLLISION DETECTION
+      // TOP 
+      if (
+        bird.dx + bird.radius > p.x &&
+        bird.dx - bird.radius < p.x + this.w &&
+        bird.dy + bird.radius > p.y &&
+        bird.dy - bird.radius < p.y + this.h
+      ) {
+        // ctx.drawImage(sprite, 520, 280, 200, 100, bird.dx - bird.radius, bird.dy - bird.radius, 200, 100);
+        state.current = state.endGame;
+      }
+      // BOTTOM 
+      if (
+        bird.dx + bird.radius > p.x &&
+        bird.dx - bird.radius < p.x + this.w &&
+        bird.dy + bird.radius > bottomPipeYPos &&
+        bird.dy - bird.radius < bottomPipeYPos + this.h
+      ) {
+        state.current = state.endGame;
+      }
 
-}
+      p.x -= this.dx;
+      //Remove pipe outside canvas
+      if (p.x + this.w <= 0) {
+        this.position.shift();
+      }
+    }
+  },
+};
 
-
-
-
-
-
-
-
-
-
+const score = {
+  highest: 0,
+  value: 0,
+  draw: function () {
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = '#9E80FE';
+  },
+};
 
 //STARTING SCREEN
 const startScreen = {
@@ -177,18 +208,19 @@ const gameOver = {
 };
 
 function draw() {
-  ctx.fillStyle= "#ffffff";
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, cvs.width, cvs.height);
   bg.draw();
-  fg.draw();
   bird.draw();
+  pipes.draw();
+
   startScreen.draw();
   gameOver.draw();
 }
 
 function update() {
   bird.fall();
-  fg.update();
+  pipes.update();
 }
 
 function loop() {
